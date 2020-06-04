@@ -12,19 +12,22 @@ import { DataService } from '../data.service';
 export class LineChartComponent implements OnInit {
   constructor(private dataService: DataService) {}
 
-  @Input() childMessage: string;
+  @Input() series: Series;
+  @Input() type: string;
 
-  async ngOnChanges(changes: SimpleChanges) {
-    let change = changes['childMessage'];
-    console.log(change);
+  ngOnChanges() {
+    if (this.type == 'positive') {
+      this.chartData = [
+        { data: this.series.positive, label: 'Positive / Day' },
+      ];
+    } else if (this.type == 'deaths') {
+      this.chartData = [{ data: this.series.deaths, label: 'Deaths / Day' }];
+    }
 
-    var series = await this.dataService.getSeries(change.currentValue);
-
-    this.chartData = [{ data: series.data, label: series.label }];
-    this.chartLabels = series.dates;
+    this.chartLabels = this.series.dates;
   }
 
-  public chartData: ChartDataSets[] = [];
+  public chartData: ChartDataSets[] = [{}];
   public chartLabels: Label[] = [];
 
   // From https://valor-software.com/ng2-charts/#/LineChart

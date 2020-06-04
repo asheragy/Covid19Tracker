@@ -36,11 +36,22 @@ export class DataService {
       return 0;
     });
 
+    var deaths = json.map((item, index) => {
+      if (index >= 7) {
+        var diff = json[index].death - json[index - 7].death;
+
+        // Daily average
+        return Math.round(diff / 7);
+      }
+
+      return 0;
+    });
+
     const series = new Series();
 
-    series.label = 'Positive';
     series.dates = json.map((x) => x.date.toString()).slice(7);
-    series.data = values.slice(7);
+    series.positive = values.slice(7);
+    series.deaths = deaths.slice(7);
 
     return series;
   }

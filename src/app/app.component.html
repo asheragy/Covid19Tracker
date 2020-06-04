@@ -19,5 +19,6 @@
 </div>
 
 <div class="chart">
-  <app-line-chart [childMessage]="selectedItem.key"></app-line-chart>
+  <app-line-chart [series]="series" type="positive"></app-line-chart>
+  <app-line-chart [series]="series" type="deaths"></app-line-chart>
 </div>

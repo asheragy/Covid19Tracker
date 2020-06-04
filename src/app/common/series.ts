@@ -1,11 +1,12 @@
 export class Series {
-  label: string = '';
-  data: number[] = [];
+  positive: number[] = [];
+  deaths: number[] = [];
   dates: string[] = [];
 }
 
 export class SeriesEntry {
   date: Date;
   positive: number;
+  death: number;
   totalTestResults: number;
 }
