@@ -22,19 +22,25 @@ export class DataService {
     var firstValidEntry = json.findIndex((x) => x.positive >= 10);
     json = json.slice(firstValidEntry);
 
-    var values = json.map((item, index) => {
-      if (index >= 7) {
-        var cases = item.positive - json[index - 7].positive;
-        var tests = item.totalTestResults - json[index - 7].totalTestResults;
-
-        var percent = 1 + cases / tests;
-
-        var result = Math.round((cases * percent) / 7); // Daily average
-        return result;
-      }
-
-      return 0;
+    const positiveWeek = json.slice(7).map((item, index) => {
+      return item.positive - json[index].positive;
     });
+
+    const positiveDay = positiveWeek.map((item) => Math.round(item / 7));
+
+    const testsWeek = json
+      .slice(7)
+      .map(
+        (item, index) => item.totalTestResults - json[index].totalTestResults
+      );
+
+    const normalizedWeek = positiveWeek.map((cases, index) => {
+      var tests = testsWeek[index];
+      var percent = 1 + cases / tests;
+      return cases * percent;
+    });
+
+    const normalizedDay = normalizedWeek.map((item) => Math.round(item / 7));
 
     var deaths = json.map((item, index) => {
       if (index >= 7) {
@@ -47,11 +53,23 @@ export class DataService {
       return 0;
     });
 
+    const active = json.map((item, index) => {
+      if (index >= 14) {
+        var diff = json[index].positive - json[index - 14].positive;
+
+        return diff;
+      }
+
+      return 0;
+    });
+
     const series = new Series();
 
     series.dates = json.map((x) => x.date.toString()).slice(7);
-    series.positive = values.slice(7);
+    series.positive = positiveDay;
+    series.positiveNormalized = normalizedDay;
     series.deaths = deaths.slice(7);
+    series.active = active;
 
     return series;
   }

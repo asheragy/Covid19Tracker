@@ -16,12 +16,27 @@ export class LineChartComponent implements OnInit {
   @Input() type: string;
 
   ngOnChanges() {
-    if (this.type == 'positive') {
-      this.chartData = [
-        { data: this.series.positive, label: 'Positive / Day' },
-      ];
-    } else if (this.type == 'deaths') {
-      this.chartData = [{ data: this.series.deaths, label: 'Deaths / Day' }];
+    switch (this.type) {
+      case 'positive': {
+        this.chartData = [
+          {
+            label: 'Positive / Day',
+            data: this.series.positive,
+          },
+          {
+            label: 'Normalized',
+            data: this.series.positiveNormalized,
+          },
+        ];
+        break;
+      }
+      case 'deaths': {
+        this.chartData = [{ data: this.series.deaths, label: 'Deaths / Day' }];
+        break;
+      }
+      case 'active': {
+        this.chartData = [{ data: this.series.active, label: 'Active cases' }];
+      }
     }
 
     this.chartLabels = this.series.dates;

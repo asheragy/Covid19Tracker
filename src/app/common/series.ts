@@ -1,6 +1,8 @@
 export class Series {
   positive: number[] = [];
+  positiveNormalized: number[] = [];
   deaths: number[] = [];
+  active: number[] = [];
   dates: string[] = [];
 }
 
