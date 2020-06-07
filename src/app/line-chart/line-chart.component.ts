@@ -39,7 +39,9 @@ export class LineChartComponent implements OnInit {
       }
     }
 
-    this.chartLabels = this.series.dates;
+    this.chartLabels = this.series.dates.map(
+      (x) => x.getMonth() + 1 + '/' + (x.getDate() + 1)
+    );
   }
 
   public chartData: ChartDataSets[] = [{}];

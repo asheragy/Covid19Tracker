@@ -3,7 +3,7 @@ export class Series {
   positiveNormalized: number[] = [];
   deaths: number[] = [];
   active: number[] = [];
-  dates: string[] = [];
+  dates: Date[] = [];
 }
 
 export class SeriesEntry {

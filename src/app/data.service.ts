@@ -36,7 +36,7 @@ export class DataService {
 
     const normalizedWeek = positiveWeek.map((cases, index) => {
       var tests = testsWeek[index];
-      var percent = 1 + cases / tests;
+      var percent = 1 + (cases / tests) * 2;
       return cases * percent;
     });
 
@@ -65,7 +65,14 @@ export class DataService {
 
     const series = new Series();
 
-    series.dates = json.map((x) => x.date.toString()).slice(7);
+    series.dates = json
+      .map((x) => {
+        var d = x.date.toString();
+        var dateStr =
+          d.substr(0, 4) + '-' + d.substr(4, 2) + '-' + d.substr(6, 2);
+        return new Date(dateStr);
+      })
+      .slice(7);
     series.positive = positiveDay;
     series.positiveNormalized = normalizedDay;
     series.deaths = deaths.slice(7);
