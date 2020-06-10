@@ -1,12 +1,22 @@
 <style>
   select {
     display: block;
-    margin: 0 auto;
+    margin: 16px auto;
   }
 
   .chart {
     margin: 0 auto;
     width: 80%;
+  }
+
+  #dual {
+    display: flex;
+    margin-top: 20px;
+  }
+
+  #left,
+  #right {
+    flex: 0 0 50%;
   }
 </style>
 
@@ -20,6 +30,8 @@
 
 <div class="chart">
   <app-line-chart [series]="series" type="positive"></app-line-chart>
-  <app-line-chart [series]="series" type="deaths"></app-line-chart>
-  <app-line-chart [series]="series" type="active"></app-line-chart>
+  <div id="dual">
+    <app-line-chart id="left" [series]="series" type="deaths"></app-line-chart>
+    <app-line-chart id="right" [series]="series" type="active"></app-line-chart>
+  </div>
 </div>

@@ -15,27 +15,50 @@ export class LineChartComponent implements OnInit {
   @Input() series: Series;
   @Input() type: string;
 
+  private getDataSet(
+    label: string,
+    data: number[],
+    color: string
+  ): ChartDataSets {
+    return {
+      fill: false,
+      label: label,
+      data: data,
+      pointBackgroundColor: color,
+      pointBorderColor: color,
+      backgroundColor: color,
+      borderColor: color,
+      borderWidth: 2,
+    };
+  }
+
   ngOnChanges() {
     switch (this.type) {
       case 'positive': {
         this.chartData = [
-          {
-            label: 'Positive / Day',
-            data: this.series.positive,
-          },
-          {
-            label: 'Normalized',
-            data: this.series.positiveNormalized,
-          },
+          this.getDataSet(
+            'Positive / Day',
+            this.series.positive,
+            Colors.LightBlue
+          ),
+          this.getDataSet(
+            'Normalized',
+            this.series.positiveNormalized,
+            Colors.Blue
+          ),
         ];
         break;
       }
       case 'deaths': {
-        this.chartData = [{ data: this.series.deaths, label: 'Deaths / Day' }];
+        this.chartData = [
+          this.getDataSet('Deaths / Day', this.series.deaths, Colors.Red),
+        ];
         break;
       }
       case 'active': {
-        this.chartData = [{ data: this.series.active, label: 'Active cases' }];
+        this.chartData = [
+          this.getDataSet('Active cases', this.series.active, Colors.Green),
+        ];
       }
     }
 
@@ -78,26 +101,13 @@ export class LineChartComponent implements OnInit {
       ],
     },
   };
-  public chartColors: Color[] = [
-    {
-      // grey
-      backgroundColor: 'rgba(148,159,177,0.2)',
-      borderColor: 'rgba(148,159,177,1)',
-      pointBackgroundColor: 'rgba(148,159,177,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(148,159,177,0.8)',
-    },
-    {
-      // dark grey
-      backgroundColor: 'rgba(77,83,96,0.2)',
-      borderColor: 'rgba(77,83,96,1)',
-      pointBackgroundColor: 'rgba(77,83,96,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(77,83,96,1)',
-    },
-  ];
 
   ngOnInit() {}
+}
+
+class Colors {
+  static Blue = 'rgba(34,132,245,1.0)';
+  static LightBlue = 'rgba(54,162,235,1.0)';
+  static Red = 'rgb(255,99,132)';
+  static Green = 'rgb(75, 192,192)';
 }

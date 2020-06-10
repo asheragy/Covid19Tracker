@@ -42,16 +42,11 @@ export class DataService {
 
     const normalizedDay = normalizedWeek.map((item) => Math.round(item / 7));
 
-    var deaths = json.map((item, index) => {
-      if (index >= 7) {
-        var diff = json[index].death - json[index - 7].death;
-
-        // Daily average
-        return Math.round(diff / 7);
-      }
-
-      return 0;
+    const deathsWeek = json.slice(7).map((item, index) => {
+      return item.death - json[index].death;
     });
+
+    const deathsDay = deathsWeek.map((x) => Math.round((10 * x) / 7) / 10);
 
     const active = json.map((item, index) => {
       if (index >= 14) {
@@ -75,7 +70,7 @@ export class DataService {
       .slice(7);
     series.positive = positiveDay;
     series.positiveNormalized = normalizedDay;
-    series.deaths = deaths.slice(7);
+    series.deaths = deathsDay;
     series.active = active;
 
     return series;
