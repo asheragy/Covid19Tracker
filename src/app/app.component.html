@@ -5,18 +5,31 @@
   }
 
   .chart {
+    box-sizing: border-box;
+    padding: 20px;
+  }
+
+  .main {
     margin: 0 auto;
-    width: 80%;
+    width: 90%;
   }
 
-  #dual {
-    display: flex;
-    margin-top: 20px;
+  #left {
+    float: left;
+    width: 50%;
   }
 
-  #left,
   #right {
-    flex: 0 0 50%;
+    float: right;
+    width: 50%;
+  }
+
+  /* Below this width no longer show graphs side by side*/
+  @media screen and (max-width: 1200px) {
+    #left,
+    #right {
+      width: 100%;
+    }
   }
 </style>
 
@@ -29,9 +42,19 @@
 </div>
 
 <div class="chart">
-  <app-line-chart [series]="series" type="positive"></app-line-chart>
-  <div id="dual">
-    <app-line-chart id="left" [series]="series" type="deaths"></app-line-chart>
-    <app-line-chart id="right" [series]="series" type="active"></app-line-chart>
+  <app-line-chart id="main" [series]="series" type="positive"></app-line-chart>
+  <div id="container">
+    <app-line-chart
+      id="left"
+      class="chart"
+      [series]="series"
+      type="deaths"
+    ></app-line-chart>
+    <app-line-chart
+      id="right"
+      class="chart"
+      [series]="series"
+      type="active"
+    ></app-line-chart>
   </div>
 </div>

@@ -29,6 +29,7 @@ export class LineChartComponent implements OnInit {
       backgroundColor: color,
       borderColor: color,
       borderWidth: 2,
+      pointRadius: 2,
     };
   }
 

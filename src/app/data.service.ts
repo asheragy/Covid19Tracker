@@ -34,10 +34,25 @@ export class DataService {
         (item, index) => item.totalTestResults - json[index].totalTestResults
       );
 
-    const normalizedWeek = positiveWeek.map((cases, index) => {
+    // Unscaled normalized value
+    const normalizedRaw = positiveWeek.map((cases, index) => {
       var tests = testsWeek[index];
-      var percent = 1 + (cases / tests) * 2;
-      return cases * percent;
+      var percent = cases / tests;
+      return Math.sqrt(cases * percent);
+    });
+
+    // Normalize values based off highest_real_value * 2
+    const maxRawNormalized = Math.max(...normalizedRaw);
+    const indexOfMax = normalizedRaw.indexOf(maxRawNormalized);
+    const normalizedMax = positiveWeek[indexOfMax] * 2;
+
+    const normalizedWeek = positiveWeek.map((actualCases, index) => {
+      //var tests = testsWeek[index];
+      //var percent = 1 + (actualCases / tests) * 2;
+      //return actualCases * percent;
+
+      var normalized = normalizedRaw[index];
+      return normalizedMax * (normalized / maxRawNormalized);
     });
 
     const normalizedDay = normalizedWeek.map((item) => Math.round(item / 7));
