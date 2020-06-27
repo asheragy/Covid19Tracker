@@ -3,6 +3,7 @@ export class Series {
   positiveNormalized: number[] = [];
   deaths: number[] = [];
   active: number[] = [];
+  percentPositive: number[] = [];
   dates: Date[] = [];
 }
 

@@ -2,6 +2,7 @@ import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { Label, Color, SingleLineLabel } from 'ng2-charts';
 import { Series, SeriesEntry } from '../common/series';
+import { DataSet } from '../common/dataSet';
 import { DataService } from '../data.service';
 
 @Component({
@@ -12,8 +13,8 @@ import { DataService } from '../data.service';
 export class LineChartComponent implements OnInit {
   constructor(private dataService: DataService) {}
 
-  @Input() series: Series;
-  @Input() type: string;
+  @Input() dataSets: DataSet[];
+  @Input() dates: Date[] = [];
 
   private getDataSet(
     label: string,
@@ -34,36 +35,11 @@ export class LineChartComponent implements OnInit {
   }
 
   ngOnChanges() {
-    switch (this.type) {
-      case 'positive': {
-        this.chartData = [
-          this.getDataSet(
-            'Positive / Day',
-            this.series.positive,
-            Colors.LightBlue
-          ),
-          this.getDataSet(
-            'Normalized',
-            this.series.positiveNormalized,
-            Colors.Blue
-          ),
-        ];
-        break;
-      }
-      case 'deaths': {
-        this.chartData = [
-          this.getDataSet('Deaths / Day', this.series.deaths, Colors.Red),
-        ];
-        break;
-      }
-      case 'active': {
-        this.chartData = [
-          this.getDataSet('Active cases', this.series.active, Colors.Green),
-        ];
-      }
-    }
+    this.chartData = this.dataSets.map((x) =>
+      this.getDataSet(x.label, x.data, x.color)
+    );
 
-    this.chartLabels = this.series.dates.map(
+    this.chartLabels = this.dates.map(
       (x) => x.getMonth() + 1 + '/' + (x.getDate() + 1)
     );
   }
@@ -111,4 +87,5 @@ class Colors {
   static LightBlue = 'rgba(54,162,235,1.0)';
   static Red = 'rgb(255,99,132)';
   static Green = 'rgb(75, 192,192)';
+  static Yellow = 'rgb(250, 244, 82)';
 }

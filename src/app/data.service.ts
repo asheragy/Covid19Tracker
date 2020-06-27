@@ -12,7 +12,7 @@ export class DataService {
     var url =
       state == 'us'
         ? 'https://covidtracking.com/api/v1/us/daily.json'
-        : `https://covidtracking.com/api/v1/states/${state}/daily.json`;
+        : `https://covidtracking.com/api/v1/states/${state.toLowerCase()}/daily.json`;
 
     console.log(url);
     var json = (
@@ -34,31 +34,27 @@ export class DataService {
         (item, index) => item.totalTestResults - json[index].totalTestResults
       );
 
-    // Unscaled normalized value
-    const normalizedRaw = positiveWeek.map((cases, index) => {
+    const percentPositive = positiveWeek.map((cases, index) => {
       var tests = testsWeek[index];
       var percent = cases / tests;
-      return Math.sqrt(cases * percent);
+      return Math.min(percent, 0.25); // Not useful over 25%
     });
 
-    // Normalize values based off highest_real_value * 2
-    const maxRawNormalized = Math.max(...normalizedRaw);
-    const indexOfMax = normalizedRaw.indexOf(maxRawNormalized);
-    const normalizedMax = positiveWeek[indexOfMax] * 2;
-
     const normalizedWeek = positiveWeek.map((actualCases, index) => {
-      //var tests = testsWeek[index];
-      //var percent = 1 + (actualCases / tests) * 2;
-      //return actualCases * percent;
+      var percentDiff = (percentPositive[index] - 0.03) / 0.03;
+      percentDiff *= 0.33;
 
-      var normalized = normalizedRaw[index];
-      return normalizedMax * (normalized / maxRawNormalized);
+      return actualCases * percentDiff + actualCases;
     });
 
     const normalizedDay = normalizedWeek.map((item) => Math.round(item / 7));
 
     const deathsWeek = json.slice(7).map((item, index) => {
-      return item.death - json[index].death;
+      var n = item.death;
+      if (n >= 118031)
+        // Correction for NJ on 6/25
+        n -= 1854;
+      return n - json[index].death;
     });
 
     const deathsDay = deathsWeek.map((x) => Math.round((10 * x) / 7) / 10);
@@ -87,6 +83,9 @@ export class DataService {
     series.positiveNormalized = normalizedDay;
     series.deaths = deathsDay;
     series.active = active;
+    series.percentPositive = percentPositive.map(
+      (x) => Math.round(x * 10000) / 100
+    );
 
     return series;
   }
