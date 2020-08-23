@@ -40,7 +40,7 @@ export class LineChartComponent implements OnInit {
     );
 
     this.chartLabels = this.dates.map(
-      (x) => x.getMonth() + 1 + '/' + (x.getDate() + 1)
+      (x) => x.getUTCMonth() + 1 + '/' + x.getUTCDate()
     );
   }
 

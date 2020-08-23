@@ -11,14 +11,15 @@ export class DataService {
   public async getSeries(state: string): Promise<Series> {
     var url =
       state == 'us'
-        ? 'https://covidtracking.com/api/v1/us/daily.json'
-        : `https://covidtracking.com/api/v1/states/${state.toLowerCase()}/daily.json`;
+        ? 'https://api.covidtracking.com/v1/us/daily.json'
+        : `https://api.covidtracking.com/v1/states/${state.toLowerCase()}/daily.json`;
 
     console.log(url);
     var json = (
       await this.httpClient.get<Array<SeriesEntry>>(url).toPromise()
     ).reverse();
 
+    console.log(`Got ${json.length} entries`);
     var firstValidEntry = json.findIndex((x) => x.positive >= 10);
     json = json.slice(firstValidEntry);
 
@@ -86,6 +87,15 @@ export class DataService {
     series.percentPositive = percentPositive.map(
       (x) => Math.round(x * 10000) / 100
     );
+
+    series.percentChange = normalizedDay.map((x, index) => {
+      if (index < 7) return 0;
+
+      var percent = (x - normalizedDay[index - 7]) / normalizedDay[index - 7];
+      if (percent > 1) return 100;
+
+      return Math.round(percent * 10000) / 100;
+    });
 
     return series;
   }

@@ -21,6 +21,7 @@ export class AppComponent {
   dataSetsDeaths: DataSet[];
   dataSetsActive: DataSet[];
   dataSetsPercentPositive: DataSet[];
+  dataSetsPercentChange: DataSet[];
 
   title = 'Covid19Tracker';
 
@@ -109,6 +110,10 @@ export class AppComponent {
     this.dataSetsPercentPositive = [
       new DataSet('% Positive', Colors.Yellow, series.percentPositive),
     ];
+
+    this.dataSetsPercentChange = [
+      new DataSet('% Change', Colors.Orange, series.percentChange),
+    ];
   }
 }
 
@@ -118,4 +123,5 @@ class Colors {
   static Red = 'rgb(255,99,132)';
   static Green = 'rgb(75, 192,192)';
   static Yellow = 'rgb(250, 244, 82)';
+  static Orange = 'rgb(255,159,64)';
 }

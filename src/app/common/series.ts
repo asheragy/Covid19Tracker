@@ -4,6 +4,7 @@ export class Series {
   deaths: number[] = [];
   active: number[] = [];
   percentPositive: number[] = [];
+  percentChange: number[] = [];
   dates: Date[] = [];
 }
 

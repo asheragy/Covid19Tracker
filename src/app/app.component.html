@@ -6,12 +6,17 @@
 
   .chart {
     box-sizing: border-box;
-    padding: 20px;
+    padding: 10px;
   }
 
   .main {
     margin: 0 auto;
     width: 90%;
+  }
+
+  .large {
+    float: left;
+    width: 67%;
   }
 
   .small {
@@ -21,7 +26,8 @@
 
   /* Below this width no longer show graphs side by side*/
   @media screen and (max-width: 1200px) {
-    .small {
+    .small,
+    .large {
       width: 100%;
     }
   }
@@ -36,17 +42,21 @@
 </div>
 
 <div class="chart">
-  <app-line-chart
-    id="main"
-    [dates]="dates"
-    [dataSets]="dataSetsCases"
-  ></app-line-chart>
-  <div id="container">
+  <div id="container" id="main">
+    <app-line-chart
+      class="chart large"
+      [dates]="dates"
+      [dataSets]="dataSetsCases"
+    ></app-line-chart>
+
     <app-line-chart
       class="chart small"
       [dates]="dates"
       [dataSets]="dataSetsDeaths"
     ></app-line-chart>
+  </div>
+
+  <div id="container">
     <app-line-chart
       class="chart small"
       [dates]="dates"
@@ -57,6 +67,12 @@
       class="chart small"
       [dates]="dates"
       [dataSets]="dataSetsPercentPositive"
+    ></app-line-chart>
+
+    <app-line-chart
+      class="chart small"
+      [dates]="dates"
+      [dataSets]="dataSetsPercentChange"
     ></app-line-chart>
   </div>
 </div>
