@@ -13,4 +13,5 @@ export class SeriesEntry {
   positive: number;
   death: number;
   totalTestResults: number;
+  totalTestsViral: number;
 }

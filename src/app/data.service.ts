@@ -29,16 +29,16 @@ export class DataService {
 
     const positiveDay = positiveWeek.map((item) => Math.round(item / 7));
 
-    const testsWeek = json
-      .slice(7)
-      .map(
-        (item, index) => item.totalTestResults - json[index].totalTestResults
-      );
+    const testsWeek = json.slice(7).map((item, index) => {
+      var t = item.totalTestResults - json[index].totalTestResults;
+      if (t < 0) t = item.totalTestsViral - json[index].totalTestsViral;
+      return t;
+    });
 
     const percentPositive = positiveWeek.map((cases, index) => {
       var tests = testsWeek[index];
       var percent = cases / tests;
-      return Math.min(percent, 0.25); // Not useful over 25%
+      return Math.min(percent, 0.5); // Not useful over 50%
     });
 
     const normalizedWeek = positiveWeek.map((actualCases, index) => {
@@ -49,26 +49,22 @@ export class DataService {
     });
 
     const normalizedDay = normalizedWeek.map((item) => Math.round(item / 7));
-
-    const deathsWeek = json.slice(7).map((item, index) => {
-      var n = item.death;
-      if (n >= 118031)
-        // Correction for NJ on 6/25
-        n -= 1854;
-      return n - json[index].death;
-    });
-
+    const deathsWeek = json
+      .slice(7)
+      .map((item, index) => item.death - json[index].death);
     const deathsDay = deathsWeek.map((x) => Math.round((10 * x) / 7) / 10);
 
-    const active = json.map((item, index) => {
-      if (index >= 14) {
-        var diff = json[index].positive - json[index - 14].positive;
+    const active = json
+      .map((item, index) => {
+        if (index >= 14) {
+          var diff = json[index].positive - json[index - 14].positive;
 
-        return diff;
-      }
+          return diff;
+        }
 
-      return 0;
-    });
+        return item.positive;
+      })
+      .slice(7);
 
     const series = new Series();
 
@@ -84,6 +80,7 @@ export class DataService {
     series.positiveNormalized = normalizedDay;
     series.deaths = deathsDay;
     series.active = active;
+
     series.percentPositive = percentPositive.map(
       (x) => Math.round(x * 10000) / 100
     );
@@ -97,6 +94,7 @@ export class DataService {
       return Math.round(percent * 10000) / 100;
     });
 
+    //console.log(series);
     return series;
   }
 }
