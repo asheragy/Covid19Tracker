@@ -1,0 +1,33 @@
+select {
+  display: block;
+  margin: 16px auto;
+}
+
+.chart {
+  box-sizing: border-box;
+  padding: 10px;
+  display: block;
+}
+
+.chart-row {
+  margin: 0 auto;
+  width: 100%;
+}
+
+.large {
+  float: left;
+  width: 67%;
+}
+
+.small {
+  float: left;
+  width: 33%;
+}
+
+/* Below this width no longer show graphs side by side*/
+@media screen and (max-width: 1200px) {
+  .small,
+  .large {
+    width: 100%;
+  }
+}
