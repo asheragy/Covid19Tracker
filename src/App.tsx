@@ -47,7 +47,7 @@ function App() {
 
   // Load first time with data
   // TODO move to an onload event for the StatePicker when list is first filled
-  onStateChange("us");
+  //onStateChange("us");
 
   return (
     <div>
