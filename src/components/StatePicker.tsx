@@ -24,6 +24,9 @@ function getItem(key: string, value: string) {
 
 const listItems = [
   { key: "us", value: "United States" },
+  //{ key: "upper", value: "US - Upper" },
+  //{ key: "middle", value: "US - Middle" },
+  //{ key: "lower", value: "US - Lower" },
   { key: "AL", value: "Alabama" },
   { key: "AK", value: "Alaska" },
   { key: "AZ", value: "Arizona" },
