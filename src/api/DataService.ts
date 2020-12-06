@@ -62,6 +62,16 @@ const lowerStates = [
 ];
 */
 
+function roundDecimal(value: number) {
+  return Math.round((value * 10) / 7) / 10;
+}
+
+function parseDate(date: Date) {
+  var d = date.toString();
+  var dateStr = d.substr(0, 4) + "-" + d.substr(4, 2) + "-" + d.substr(6, 2);
+  return new Date(dateStr);
+}
+
 export class DataService {
   public async getSingleData(state: string): Promise<Array<SeriesEntry>> {
     var url =
@@ -117,84 +127,62 @@ export class DataService {
     //  var arrayData = await this.getMergedData(lowerStates);
     //else
     var arrayData = await this.getSingleData(state);
-
     console.log(`Got ${arrayData.length} entries`);
-    var firstValidEntry = arrayData.findIndex((x) => x.positive >= 10);
+
+    // Filter to weekly data
+    var modValue = (arrayData.length - 1) % 7;
+    arrayData = arrayData.filter((_, index) => index % 7 == modValue);
+
+    // Start series when > 100 cases
+    var firstValidEntry = arrayData.findIndex((x) => x.positive >= 100);
 
     // TODO rename json to something else
     const json = arrayData.slice(firstValidEntry);
 
-    const positiveWeek = json.slice(7).map((item, index) => {
-      return item.positive - json[index].positive;
-    });
+    const series = new Series();
 
-    var positiveDay = positiveWeek.map((item) => Math.round(item / 7));
+    const positiveWeek = json.slice(1).map((item, index) => item.positive - json[index].positive);
+    series.positive = positiveWeek.map((item) => Math.round(item / 7));
 
-    const testsWeek = json.slice(7).map((item, index) => {
+    const testsWeek = json.slice(1).map((item, index) => {
       var t = item.totalTestResults - json[index].totalTestResults;
       if (t < 0) t = item.totalTestsViral - json[index].totalTestsViral;
       return t;
     });
 
-    const percentPositive = positiveWeek.map((cases, index) => {
-      var tests = testsWeek[index];
-      var percent = cases / tests;
-      return Math.min(percent, 0.5); // Not useful over 50%
-    });
+    const maxPercentPos = 0.5; // Not useful when larger
+    const percentPositive = positiveWeek.map((cases, index) => Math.min(cases / testsWeek[index], maxPercentPos));
 
-    const normalizedWeek = positiveWeek.map((actualCases, index) => {
-      //var percentDiff = (percentPositive[index] - 0.03) / 0.03;
-      //percentDiff *= 0.33;
-      var percentDiff = percentPositive[index];
-      percentDiff *= percentDiff * 2;
+    const normalized = positiveWeek
+      .map((actualCases, index) => {
+        var percentDiff = percentPositive[index];
+        percentDiff *= percentDiff * 2;
+        return actualCases * percentDiff + actualCases;
+      })
+      .map((item) => Math.round(item / 7));
 
-      return actualCases * percentDiff + actualCases;
-    });
+    series.deaths = json.slice(1).map((item, index) => roundDecimal(item.death - json[index].death));
 
-    const normalizedDay = normalizedWeek.map((item) => Math.round(item / 7));
-
-    const deathsWeek = json
-      .slice(7)
-      .map((item, index) => item.death - json[index].death);
-    const deathsDay = deathsWeek.map((x) => Math.round((10 * x) / 7) / 10);
-
-    const active = json
+    series.active = json
       .map((item, index) => {
-        if (index >= 14) {
-          var diff = json[index].positive - json[index - 14].positive;
-
+        if (index >= 2) {
+          var diff = json[index].positive - json[index - 2].positive;
           return diff;
         }
 
         return item.positive;
       })
-      .slice(7);
+      .slice(1);
 
-    const series = new Series();
+    series.dates = json.map((x) => parseDate(x.date)).slice(1);
+    series.positiveNormalized = normalized;
+    series.percentPositive = percentPositive.map((x) => Math.round(x * 10000) / 100);
+    series.percentChange = normalized.map((x, index) => {
+      const weeks = 3;
+      if (index < weeks) return 0;
 
-    series.dates = json
-      .map((x) => {
-        var d = x.date.toString();
-        var dateStr =
-          d.substr(0, 4) + "-" + d.substr(4, 2) + "-" + d.substr(6, 2);
-        return new Date(dateStr);
-      })
-      .slice(7);
-    series.positive = positiveDay;
-    series.positiveNormalized = normalizedDay;
-    series.deaths = deathsDay;
-    series.active = active;
-
-    series.percentPositive = percentPositive.map(
-      (x) => Math.round(x * 10000) / 100
-    );
-
-    series.percentChange = normalizedDay.map((x, index) => {
-      if (index < 7) return 0;
-
-      var percent = (x - normalizedDay[index - 7]) / normalizedDay[index - 7];
-      if (percent > 1) return 100;
-
+      var percent = (x - normalized[index - weeks]) / normalized[index - weeks];
+      if (percent > 2) percent = 2;
       return Math.round(percent * 10000) / 100;
     });
 
